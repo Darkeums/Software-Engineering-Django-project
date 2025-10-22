@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Delete Movie: {{ movie.title }}{% endblock %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card border-danger shadow-lg">
+                <div class="card-header bg-danger text-white">
+                    <h2 class="mb-0">Confirm Deletion</h2>
+                </div>
+                <div class="card-body">
+                    <p class="card-text fs-5">
+                        Are you absolutely sure you want to delete the movie:
+                    </p>
+                    <p class="alert alert-warning text-center fw-bold fs-4">
+                        "{{ movie.title }}" ({{ movie.release_year }})?
+                    </p>
+                    <p class="card-text">
+                        This action **cannot be undone**.
+                    </p>
+                    
+                    <form method="post" class="d-flex justify-content-between mt-4">
+                        {% csrf_token %}
+                        <!-- Cancel button redirects back to the list -->
+                        <a href="{% url 'list_movies' %}" class="btn btn-outline-secondary btn-lg">
+                            Cancel
+                        </a>
+                        <!-- Confirm Delete button -->
+                        <button type="submit" class="btn btn-danger btn-lg">
+                            <i class="bi bi-trash me-2"></i> Yes, Delete Movie
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
