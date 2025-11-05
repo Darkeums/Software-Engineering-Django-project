@@ -14,8 +14,11 @@ pipeline {
             steps {
                 bat '''
                 REM === Switch Docker to Minikube Docker ===
-                REM *** PERMANENT FIX: Overriding broken [::1] address with stable IPv4 ***
+                REM *** FINAL FIX: Overriding with stable IP and required TLS security variables ***
                 SET DOCKER_HOST=tcp://192.168.49.2:2376
+                SET DOCKER_TLS_VERIFY=1
+                SET DOCKER_CERT_PATH=C:\\Users\\janaj\\.minikube\\certs
+                
                 REM === Build Django image inside Minikube Docker ===
                 docker build -t mydjangoapp:latest .
                 '''
