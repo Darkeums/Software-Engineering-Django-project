@@ -14,8 +14,8 @@ pipeline {
             steps {
                 bat '''
                 REM === Switch Docker to Minikube Docker ===
-                call minikube docker-env --shell=cmd > docker_env.bat
-                call docker_env.bat
+                REM *** PERMANENT FIX: Overriding broken [::1] address with stable IPv4 ***
+                SET DOCKER_HOST=tcp://192.168.49.2:2376
                 REM === Build Django image inside Minikube Docker ===
                 docker build -t mydjangoapp:latest .
                 '''
