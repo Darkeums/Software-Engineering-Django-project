@@ -13,8 +13,8 @@ pipeline {
         stage('Build in Minikube Docker') {
             steps {
                 bat '''
-                REM === Switch Docker to Minikube Docker ===
                 REM *** FINAL FIX: Overriding with stable IP and required TLS security variables ***
+                REM *** Minikube IP is 192.168.49.2 ***
                 SET DOCKER_HOST=tcp://192.168.49.2:2376
                 SET DOCKER_TLS_VERIFY=1
                 SET DOCKER_CERT_PATH=C:\\Users\\janaj\\.minikube\\certs
