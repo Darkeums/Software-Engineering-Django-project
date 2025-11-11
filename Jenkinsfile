@@ -10,18 +10,22 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/Darkeums/Software-Engineering-Django-project.git'
             }
         }
+        stage('Set Docker Environment') {
+            steps {
+                bat '''
+                REM *** Use minikube to set the correct Docker environment variables ***
+                FOR /f "tokens=*" %%i IN ('minikube -p minikube docker-env --shell cmd') DO %%i
+                '''
+                // NOTE: This dynamically sets DOCKER_HOST, DOCKER_TLS_VERIFY, and DOCKER_CERT_PATH
+            }
+        }
         stage('Build in Minikube Docker') {
             steps {
                 bat '''
-                REM *** FINAL FIX: Overriding with stable IP and required TLS security variables ***
-                REM *** Minikube IP is 192.168.49.2 ***
-                SET DOCKER_HOST=tcp://192.168.49.2:2376
-                SET DOCKER_TLS_VERIFY=1
-                SET DOCKER_CERT_PATH=C:\\Users\\janaj\\.minikube\\certs
-                
                 REM === Build Django image inside Minikube Docker ===
                 docker build -t mydjangoapp:latest .
                 '''
+                // The environment variables are now set by the previous stage.
             }
         }
         stage('Deploy to Minikube') {
