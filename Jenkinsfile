@@ -13,13 +13,16 @@ pipeline {
         stage('Build in Minikube Docker') {
             steps {
                 bat '''
-                REM === 1. Switch Docker to Minikube Docker (Sets certs/TLS/etc.) ===
+                REM === 1. FORCE MINIKUBE START (Ensures Minikube is running before we get its IP) ===
+                minikube start --driver=docker || exit 1 
+
+                REM === 2. Switch Docker to Minikube Docker (Sets certs/TLS/etc.) ===
                 call minikube docker-env --shell=cmd > docker_env.bat
                 call docker_env.bat
                 
-                REM === 2. OVERRIDE DOCKER_HOST to use IPv4 instead of IPv6 ([::1]) ===
-                REM Get the IPv4 address of the Minikube host (e.g., 192.168.49.2)
-                FOR /F "tokens=*" %%i IN ('minikube ip') DO SET MINIKUBE_IP=%%i
+                REM === 3. OVERRIDE DOCKER_HOST to use reliable IPv4 instead of IPv6 ([::1]) ===
+                REM We pipe stderr to NUL to prevent "minikube ip" warnings from being captured as output.
+                FOR /F "tokens=*" %%i IN ('minikube ip 2^>NUL') DO SET MINIKUBE_IP=%%i
                 
                 REM Extract the dynamic port number assigned by minikube docker-env (e.g., 61967)
                 FOR /F "tokens=3 delims=:" %%p IN ('echo %DOCKER_HOST%') DO SET DOCKER_PORT=%%p
@@ -28,7 +31,7 @@ pipeline {
                 
                 ECHO DOCKER_HOST successfully overridden to: %DOCKER_HOST%
 
-                REM === 3. Build Django image inside Minikube Docker ===
+                REM === 4. Build Django image inside Minikube Docker ===
                 docker build -t mydjangoapp:latest .
                 '''
             }
