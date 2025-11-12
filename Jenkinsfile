@@ -21,11 +21,15 @@ pipeline {
                 call docker_env.bat
                 
                 REM === 3. OVERRIDE DOCKER_HOST to use reliable IPv4 instead of IPv6 ([::1]) ===
-                REM We pipe stderr to NUL to prevent "minikube ip" warnings from being captured as output.
+                
+                REM Get the IPv4 address of the Minikube host
                 FOR /F "tokens=*" %%i IN ('minikube ip 2^>NUL') DO SET MINIKUBE_IP=%%i
                 
-                REM Extract the dynamic port number assigned by minikube docker-env (e.g., 61967)
-                FOR /F "tokens=3 delims=:" %%p IN ('echo %DOCKER_HOST%') DO SET DOCKER_PORT=%%p
+                REM Extract the dynamic port number (now reliably token 4)
+                FOR /F "tokens=4 delims=:" %%p IN ('echo %DOCKER_HOST%') DO SET DOCKER_PORT=%%p
+
+                REM Crucial fix: Strip any extra closing bracket ']' from the port number
+                SET DOCKER_PORT=%DOCKER_PORT:]=%
 
                 SET DOCKER_HOST=tcp://%MINIKUBE_IP%:%DOCKER_PORT%
                 
